@@ -1,5 +1,203 @@
 
 
+// const Category = require("../models/Category");
+// const { uploadToBunny } = require("../utils/bunnyUpload");
+// const axios = require("axios");
+
+// // ==========================================
+// // 🔥 DELETE IMAGE FROM BUNNY
+// // ==========================================
+// const deleteFromBunny = async (publicId) => {
+//   try {
+//     if (!publicId) return;
+//     const url = `${process.env.BUNNY_STORAGE}/${publicId}`;
+//     await axios.delete(url, {
+//       headers: { AccessKey: process.env.BUNNY_API_KEY },
+//     });
+//   } catch (err) {
+//     console.log("Bunny delete error:", err.message);
+//   }
+// };
+
+// // ==========================================
+// // 🔥 CREATE CATEGORY
+// // ==========================================
+// exports.createCategory = async (req, res) => {
+//   try {
+//     const { title, image, isFree } = req.body;
+
+//     if (!title || title.trim() === "") {
+//       return res.status(400).json({ success: false, message: "Title is required" });
+//     }
+
+//     const exists = await Category.findOne({ title: title.trim() });
+//     if (exists) {
+//       return res.status(400).json({ success: false, message: "Category already exists" });
+//     }
+
+//     let imageData = { url: "", publicId: "" };
+
+//     if (req.file) {
+//       imageData = await uploadToBunny(req.file);
+//     } else if (image) {
+//       imageData = { url: image, publicId: "" };
+//     }
+
+//     const category = await Category.create({
+//       title: title.trim(),
+//       image: imageData,
+//       isFree: isFree === "true" || isFree === true || false,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Category created successfully",
+//       data: category,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// // ==========================================
+// // 🔥 GET ALL CATEGORIES
+// // ==========================================
+// exports.getCategories = async (req, res) => {
+//   try {
+//     const categories = await Category.find()
+//       .sort({ createdAt: -1 })
+//       .lean();
+
+//     return res.status(200).json({
+//       success: true,
+//       count: categories.length,
+//       data: categories,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// // ==========================================
+// // 🔥 GET CATEGORY BY ID
+// // ==========================================
+// exports.getCategoryById = async (req, res) => {
+//   try {
+//     const category = await Category.findById(req.params.id).lean();
+
+//     if (!category) {
+//       return res.status(404).json({ success: false, message: "Category not found" });
+//     }
+
+//     return res.status(200).json({ success: true, data: category });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// // ==========================================
+// // 🔥 UPDATE CATEGORY  ← BUG FIXED HERE
+// // ==========================================
+// exports.updateCategory = async (req, res) => {
+//   try {
+//     const { title, isActive, image, isFree } = req.body;
+
+//     // ✅ FIX: updateData pehle declare karo
+//     let updateData = {};
+
+//     if (title && title.trim() !== "") {
+//       updateData.title = title.trim();
+//     }
+
+//     if (typeof isActive !== "undefined") {
+//       updateData.isActive = isActive === "true" || isActive === true;
+//     }
+
+//     // ✅ FIX: isFree string bhi ho sakta hai FormData se
+//     if (typeof isFree !== "undefined") {
+//       updateData.isFree = isFree === "true" || isFree === true;
+//     }
+
+//     const existing = await Category.findById(req.params.id);
+
+//     if (!existing) {
+//       return res.status(404).json({ success: false, message: "Category not found" });
+//     }
+
+//     if (req.file) {
+//       if (existing?.image?.publicId) {
+//         await deleteFromBunny(existing.image.publicId);
+//       }
+//       const imageData = await uploadToBunny(req.file);
+//       updateData.image = imageData;
+//     } else if (image) {
+//       updateData.image = { url: image, publicId: "" };
+//     }
+
+//     const updated = await Category.findByIdAndUpdate(
+//       req.params.id,
+//       updateData,
+//       { new: true, runValidators: true }
+//     );
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Category updated successfully",
+//       data: updated,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// // ==========================================
+// // 🔥 DELETE CATEGORY
+// // ==========================================
+// exports.deleteCategory = async (req, res) => {
+//   try {
+//     const category = await Category.findById(req.params.id);
+
+//     if (!category) {
+//       return res.status(404).json({ success: false, message: "Category not found" });
+//     }
+
+//     if (category?.image?.publicId) {
+//       await deleteFromBunny(category.image.publicId);
+//     }
+
+//     await Category.findByIdAndDelete(req.params.id);
+
+//     return res.status(200).json({ success: true, message: "Category deleted successfully" });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+// // ==========================================
+// // 🔥 TOGGLE STATUS
+// // ==========================================
+// exports.toggleCategoryStatus = async (req, res) => {
+//   try {
+//     const category = await Category.findById(req.params.id);
+
+//     if (!category) {
+//       return res.status(404).json({ success: false, message: "Category not found" });
+//     }
+
+//     category.isActive = !category.isActive;
+//     await category.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Category ${category.isActive ? "activated" : "deactivated"}`,
+//       data: category,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+// controllers/categoryController.js
+
 const Category = require("../models/Category");
 const { uploadToBunny } = require("../utils/bunnyUpload");
 const axios = require("axios");
@@ -10,9 +208,13 @@ const axios = require("axios");
 const deleteFromBunny = async (publicId) => {
   try {
     if (!publicId) return;
+
     const url = `${process.env.BUNNY_STORAGE}/${publicId}`;
+
     await axios.delete(url, {
-      headers: { AccessKey: process.env.BUNNY_API_KEY },
+      headers: {
+        AccessKey: process.env.BUNNY_API_KEY,
+      },
     });
   } catch (err) {
     console.log("Bunny delete error:", err.message);
@@ -26,27 +228,51 @@ exports.createCategory = async (req, res) => {
   try {
     const { title, image, isFree } = req.body;
 
+    // ✅ REQUIRED
     if (!title || title.trim() === "") {
-      return res.status(400).json({ success: false, message: "Title is required" });
+      return res.status(400).json({
+        success: false,
+        message: "Category title is required",
+      });
     }
 
-    const exists = await Category.findOne({ title: title.trim() });
+    // ✅ DUPLICATE CHECK
+    const exists = await Category.findOne({
+      title: title.trim(),
+    });
+
     if (exists) {
-      return res.status(400).json({ success: false, message: "Category already exists" });
+      return res.status(400).json({
+        success: false,
+        message: "Category already exists",
+      });
     }
 
-    let imageData = { url: "", publicId: "" };
+    let imageData = {
+      url: "",
+      publicId: "",
+    };
 
+    // ✅ FILE IMAGE
     if (req.file) {
       imageData = await uploadToBunny(req.file);
-    } else if (image) {
-      imageData = { url: image, publicId: "" };
     }
 
+    // ✅ IMAGE URL
+    else if (image) {
+      imageData = {
+        url: image,
+        publicId: "",
+      };
+    }
+
+    // ✅ CREATE
     const category = await Category.create({
       title: title.trim(),
       image: imageData,
-      isFree: isFree === "true" || isFree === true || false,
+      isFree:
+        isFree === "true" ||
+        isFree === true,
     });
 
     return res.status(201).json({
@@ -55,26 +281,54 @@ exports.createCategory = async (req, res) => {
       data: category,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 // ==========================================
 // 🔥 GET ALL CATEGORIES
 // ==========================================
+// ==========================================
+// 🔥 GET ALL CATEGORIES
+// ==========================================
 exports.getCategories = async (req, res) => {
   try {
-    const categories = await Category.find()
-      .sort({ createdAt: -1 })
-      .lean();
+
+    // ✅ FIXED ORDER
+    const categoryOrder = [
+      "In-Person Consultation",
+      "Online Consultation",
+      "Surgery",
+      "Order Medicines",
+      "Lab Test",
+      "Pet Care",
+    ];
+
+    const categories = await Category.find().lean();
+
+    // ✅ SORT ACCORDING TO FIXED ORDER
+    const sortedCategories = categories.sort(
+      (a, b) =>
+        categoryOrder.indexOf(a.title) -
+        categoryOrder.indexOf(b.title)
+    );
 
     return res.status(200).json({
       success: true,
-      count: categories.length,
-      data: categories,
+      count: sortedCategories.length,
+      data: sortedCategories,
     });
+
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
   }
 };
 
@@ -83,61 +337,105 @@ exports.getCategories = async (req, res) => {
 // ==========================================
 exports.getCategoryById = async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id).lean();
+    const category = await Category.findById(
+      req.params.id
+    ).lean();
 
     if (!category) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
     }
 
-    return res.status(200).json({ success: true, data: category });
+    return res.status(200).json({
+      success: true,
+      data: category,
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 // ==========================================
-// 🔥 UPDATE CATEGORY  ← BUG FIXED HERE
+// 🔥 UPDATE CATEGORY
 // ==========================================
 exports.updateCategory = async (req, res) => {
   try {
-    const { title, isActive, image, isFree } = req.body;
+    const {
+      title,
+      isActive,
+      image,
+      isFree,
+    } = req.body;
 
-    // ✅ FIX: updateData pehle declare karo
     let updateData = {};
 
+    // ✅ TITLE
     if (title && title.trim() !== "") {
       updateData.title = title.trim();
     }
 
+    // ✅ ACTIVE STATUS
     if (typeof isActive !== "undefined") {
-      updateData.isActive = isActive === "true" || isActive === true;
+      updateData.isActive =
+        isActive === "true" ||
+        isActive === true;
     }
 
-    // ✅ FIX: isFree string bhi ho sakta hai FormData se
+    // ✅ FREE / PAID
     if (typeof isFree !== "undefined") {
-      updateData.isFree = isFree === "true" || isFree === true;
+      updateData.isFree =
+        isFree === "true" ||
+        isFree === true;
     }
 
-    const existing = await Category.findById(req.params.id);
+    const existing = await Category.findById(
+      req.params.id
+    );
 
     if (!existing) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
     }
 
+    // ✅ NEW IMAGE FILE
     if (req.file) {
+      // DELETE OLD IMAGE
       if (existing?.image?.publicId) {
-        await deleteFromBunny(existing.image.publicId);
+        await deleteFromBunny(
+          existing.image.publicId
+        );
       }
-      const imageData = await uploadToBunny(req.file);
+
+      const imageData = await uploadToBunny(
+        req.file
+      );
+
       updateData.image = imageData;
-    } else if (image) {
-      updateData.image = { url: image, publicId: "" };
     }
 
+    // ✅ IMAGE URL
+    else if (image) {
+      updateData.image = {
+        url: image,
+        publicId: "",
+      };
+    }
+
+    // ✅ UPDATE CATEGORY
     const updated = await Category.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     return res.status(200).json({
@@ -146,7 +444,10 @@ exports.updateCategory = async (req, res) => {
       data: updated,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -155,44 +456,79 @@ exports.updateCategory = async (req, res) => {
 // ==========================================
 exports.deleteCategory = async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(
+      req.params.id
+    );
 
     if (!category) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
     }
 
+    // ✅ DELETE IMAGE FROM BUNNY
     if (category?.image?.publicId) {
-      await deleteFromBunny(category.image.publicId);
+      await deleteFromBunny(
+        category.image.publicId
+      );
     }
 
-    await Category.findByIdAndDelete(req.params.id);
+    // ✅ DELETE CATEGORY
+    await Category.findByIdAndDelete(
+      req.params.id
+    );
 
-    return res.status(200).json({ success: true, message: "Category deleted successfully" });
+    return res.status(200).json({
+      success: true,
+      message:
+        "Category deleted successfully",
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 // ==========================================
-// 🔥 TOGGLE STATUS
+// 🔥 TOGGLE CATEGORY STATUS
 // ==========================================
-exports.toggleCategoryStatus = async (req, res) => {
+exports.toggleCategoryStatus = async (
+  req,
+  res
+) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(
+      req.params.id
+    );
 
     if (!category) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
     }
 
+    // ✅ TOGGLE
     category.isActive = !category.isActive;
+
     await category.save();
 
     return res.status(200).json({
       success: true,
-      message: `Category ${category.isActive ? "activated" : "deactivated"}`,
+      message: `Category ${
+        category.isActive
+          ? "activated"
+          : "deactivated"
+      }`,
       data: category,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

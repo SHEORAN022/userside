@@ -11,7 +11,7 @@ const cors =
   require("cors");
 
 const http =
-  require("http");
+  require("http");;;
 
 const { Server } =
   require("socket.io");
@@ -500,6 +500,23 @@ app.use(
   )
 
 );
+
+// ✅ ROUTES
+
+const symptomCategoryRoutes =
+  require(
+    "./routes/symptomCategoryRoutes"
+  );
+
+
+// ✅ USE ROUTES
+
+app.use(
+  "/api/symptom-categories",
+  symptomCategoryRoutes
+);
+
+
 
 
 

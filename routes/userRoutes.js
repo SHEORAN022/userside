@@ -79,8 +79,7 @@ router.get(
 
 router.get(
   "/all-users",
-  protect,
-  adminOnly,
+  
   getAllUsers
 );
 

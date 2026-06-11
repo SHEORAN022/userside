@@ -1,13 +1,25 @@
+// models/Category.js
+
 const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Category title is required"],
+      required: true,
       trim: true,
-      maxlength: [100, "Title cannot exceed 100 characters"],
-      unique: true, // 🔥 duplicate avoid
+
+      // ✅ DROPDOWN VALUES
+      enum: [
+        "In-Person Consultation",
+        "Online Consultation",
+        "Surgery",
+        "Order Medicines",
+        "Lab Test",
+        "Pet Care",
+      ],
+
+      unique: true,
     },
 
     slug: {
@@ -21,14 +33,16 @@ const categorySchema = new mongoose.Schema(
         type: String,
         default: "",
       },
+
       publicId: {
         type: String,
         default: "",
       },
     },
+
     isFree: {
       type: Boolean,
-      default: false, // false = paid, true = free
+      default: false,
     },
 
     isActive: {
@@ -36,22 +50,22 @@ const categorySchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-
-// 🔥 AUTO SLUG GENERATE
+// ✅ AUTO SLUG GENERATE
 categorySchema.pre("save", function (next) {
   if (this.isModified("title")) {
     this.slug = this.title
       .toLowerCase()
       .trim()
       .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
       .replace(/[^\w-]+/g, "");
   }
 
+  
 });
-
 
 module.exports = mongoose.model("Category", categorySchema);
