@@ -1,40 +1,62 @@
+
 const mongoose = require("mongoose");
 
-const medicineItemSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Medicine name required"],
-      trim: true
-    },
+const medicineItemSchema =
+  new mongoose.Schema(
+    {
+      // ✅ SUB CATEGORY
+      medicineSubCategory: {
+        type:
+          mongoose.Schema.Types.ObjectId,
 
-    description: {
-      type: String,
-      default: ""
-    },
+        ref: "MedicineSubCategory",
 
-    image: {
-      url: {
-        type: String,
-        required: [true, "Image URL required"]
+        required: true,
       },
-      publicId: {
+
+      // ✅ NAME
+      name: {
         type: String,
-        required: [true, "Image publicId required"]
-      }
+        required: true,
+        trim: true,
+      },
+
+      description: {
+        type: String,
+        default: "",
+      },
+
+      image: {
+        url: {
+          type: String,
+          default: ""
+        },
+
+        publicId: {
+          type: String,
+          default: ""
+        },
+      },
+
+      price: {
+        type: Number,
+        required: true,
+      },
+
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
 
-    price: {
-      type: Number,
-      required: [true, "Price required"],
-      min: 0
-    },
+    {
+      timestamps: true,
+    }
+  );
 
-   
-  },
-  {
-    timestamps: true
-  }
-);
+module.exports =
+  mongoose.model(
+    "MedicineItem",
+    medicineItemSchema
+  );
 
-module.exports = mongoose.model("MedicineItem", medicineItemSchema);

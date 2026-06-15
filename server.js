@@ -366,10 +366,10 @@ app.use(
   require("./routes/subCategoryRoutes")
 );
 
-app.use(
-  "/api/medicineItem",
-  require("./routes/medicineItemRoutes")
-);
+// app.use(
+//   "/api/medicineItem",
+//   require("./routes/medicineItemRoutes")
+// );
 
 app.use(
   "/api/labCategories",
@@ -409,6 +409,35 @@ app.use("/api/notifications", notificationRoutes);
 app.use(
   "/api/offers",
   require("./routes/offerRoutes")
+);
+
+// ✅ MEDICINE CATEGORY ROUTES
+app.use(
+  "/api/medicine-categories",
+  require(
+    "./routes/medicineCategoryRoutes"
+  )
+);
+// app.use(
+//   "/api/medicine-products",
+//   require(
+//     "./routes/medicineProductRoutes"
+//   )
+// );
+app.use(
+  "/api/medicine-subcategories",
+  require(
+    "./routes/medicineSubCategoryRoutes"
+  )
+);
+
+
+// ✅ MEDICINE ITEM ROUTES
+app.use(
+  "/api/medicine-items",
+  require(
+    "./routes/medicineItemRoutes"
+  )
 );
 
 app.use(
