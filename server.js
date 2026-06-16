@@ -67,6 +67,7 @@ const io =
         "http://localhost:7000",
 
         "https://sandeepdocside.onrender.com",
+        "https://lightslategrey-dove-478815.hostingersite.com",
 
       ],
 
@@ -256,7 +257,7 @@ app.use(
       "http://localhost:7000",
 
       "https://sandeepdocside.onrender.com",
-
+       "https://lightslategrey-dove-478815.hostingersite.com",
     ],
 
     credentials: true,
